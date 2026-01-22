@@ -1,13 +1,6 @@
 {
   "_comment": "นักศึกษาต้อง export workflow จาก n8n แล้วแทนที่ไฟล์นี้",
-  "_instructions": [
-    "1. สร้าง Workflow ใน n8n ตามโจทย์ใน README.md",
-    "2. ทดสอบ Workflow ให้ทำงานถูกต้อง",
-    "3. Export Workflow: คลิก Menu (⋮) > Download",
-    "4. แทนที่ไฟล์นี้ด้วยไฟล์ที่ export มา",
-    "5. Commit และ Push ขึ้น GitHub"
-  ],
-  "name": "PLACEHOLDER - Replace with your workflow",
+  "name": "PLACEHOLDER",
   "nodes": [],
   "connections": {}
 }

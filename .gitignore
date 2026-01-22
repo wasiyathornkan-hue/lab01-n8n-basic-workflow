@@ -1,37 +1,16 @@
 # Python
 __pycache__/
 *.py[cod]
-*$py.class
-*.so
-.Python
-env/
-venv/
-.env
-
-# Testing
 .pytest_cache/
-test-results.xml
-test-output.txt
-.coverage
-htmlcov/
 
 # IDE
 .idea/
 .vscode/
-*.swp
-*.swo
 
 # OS
 .DS_Store
 Thumbs.db
 
-# n8n
-*.log
-
-# Temporary files
-*.tmp
-*.temp
-
-# Instructor only files (ห้ามแชร์นักศึกษา)
+# Solution (instructor only)
 solution/
 SETUP_GUIDE.md

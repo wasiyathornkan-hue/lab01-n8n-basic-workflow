@@ -8,10 +8,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
-    name: Run Autograding Tests
+  grade:
+    name: Check Workflow JSON
     runs-on: ubuntu-latest
-    # ไม่ใช้ Docker service - ตรวจจาก workflow.json โดยตรง
 
     steps:
       - name: Checkout repository
@@ -22,108 +21,8 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pytest
-
-      - name: Check if workflow.json exists
-        id: check_workflow
-        run: |
-          if [ -f workflow.json ]; then
-            echo "workflow_exists=true" >> $GITHUB_OUTPUT
-            echo "✅ workflow.json found"
-          else
-            echo "workflow_exists=false" >> $GITHUB_OUTPUT
-            echo "❌ workflow.json not found - please export from n8n"
-          fi
+      - name: Install pytest
+        run: pip install pytest
 
       - name: Run tests
-        id: run_tests
-        run: |
-          pytest tests/test_workflow.py -v --tb=short --junit-xml=test-results.xml 2>&1 | tee test-output.txt
-
-      - name: Calculate Score
-        id: calculate_score
-        if: always()
-        run: |
-          python << 'EOF'
-          import xml.etree.ElementTree as ET
-          import os
-          
-          # คะแนนแต่ละ test (รวม 100 คะแนน)
-          test_scores = {
-              "test_01_workflow_file_exists": 10,
-              "test_02_workflow_valid_json": 10,
-              "test_03_has_webhook_node": 10,
-              "test_04_has_code_node": 10,
-              "test_05_webhook_method_post": 10,
-              "test_06_webhook_path_lab01": 10,
-              "test_07_code_calculates_total": 10,
-              "test_08_code_calculates_average": 10,
-              "test_09_code_has_grade_logic": 10,
-              "test_10_code_has_status_logic": 10,
-          }
-          
-          total_score = 0
-          max_score = 100
-          passed_tests = []
-          failed_tests = []
-          
-          try:
-              tree = ET.parse('test-results.xml')
-              root = tree.getroot()
-              
-              for testcase in root.iter('testcase'):
-                  test_name = testcase.get('name')
-                  
-                  failure = testcase.find('failure')
-                  error = testcase.find('error')
-                  skipped = testcase.find('skipped')
-                  
-                  if failure is None and error is None and skipped is None:
-                      if test_name in test_scores:
-                          total_score += test_scores[test_name]
-                          passed_tests.append(f"✅ {test_name}: +{test_scores[test_name]} pts")
-                  else:
-                      if test_name in test_scores:
-                          failed_tests.append(f"❌ {test_name}: 0/{test_scores[test_name]} pts")
-          
-          except Exception as e:
-              print(f"Error parsing test results: {e}")
-          
-          print("=" * 60)
-          print("📊 Lab 01 Grading Results")
-          print("=" * 60)
-          print()
-          
-          if passed_tests:
-              print("✅ Passed Tests:")
-              for t in passed_tests:
-                  print(f"   {t}")
-              print()
-          
-          if failed_tests:
-              print("❌ Failed Tests:")
-              for t in failed_tests:
-                  print(f"   {t}")
-              print()
-          
-          print("=" * 60)
-          print(f"🏆 Total Score: {total_score}/{max_score}")
-          print("=" * 60)
-          
-          with open(os.environ.get('GITHUB_OUTPUT', '/dev/null'), 'a') as f:
-              f.write(f"score={total_score}\n")
-              f.write(f"max_score={max_score}\n")
-          
-          EOF
-
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-results
-          path: |
-            test-results.xml
-            test-output.txt
+        run: pytest tests/test_workflow.py -v --tb=short

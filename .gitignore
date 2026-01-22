@@ -17,3 +17,14 @@ SETUP_GUIDE.md
 workflow-solution.json
 tests/conftest.py
 screenshots/
+
+# Slides - ส่งแค่ PDF
+Slides/*.tex
+Slides/*.aux
+Slides/*.log
+Slides/*.nav
+Slides/*.out
+Slides/*.snm
+Slides/*.toc
+Slides/*.vrb
+Slides/*.synctex.gz

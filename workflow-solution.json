@@ -1,0 +1,64 @@
+{
+  "name": "Lab01-Student-Grade-Calculator",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lab01",
+        "responseMode": "lastNode",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json; charset=utf-8"
+              }
+            ]
+          }
+        }
+      },
+      "id": "webhook-node",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 300],
+      "webhookId": "lab01-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Lab 01: Student Grade Calculator\nconst item = $input.first().json;\n\n// ดึงข้อมูลจาก body (Webhook อาจส่งมาใน body หรือ root)\nconst input = item.body || item;\n\n// คำนวณ total (ผลรวมของ scores)\nconst total = input.scores.reduce((sum, score) => sum + score, 0);\n\n// คำนวณ average (ค่าเฉลี่ย)\nconst average = Math.round((total / input.scores.length) * 10) / 10;\n\n// ตัดเกรดตามเกณฑ์\nlet grade;\nif (average >= 80) {\n  grade = 'A';\n} else if (average >= 70) {\n  grade = 'B';\n} else if (average >= 60) {\n  grade = 'C';\n} else if (average >= 50) {\n  grade = 'D';\n} else {\n  grade = 'F';\n}\n\n// กำหนด status\nconst status = average >= 50 ? 'passed' : 'failed';\n\n// ส่งผลลัพธ์กลับ\nreturn [{\n  json: {\n    student_id: input.student_id,\n    name: input.name,\n    total: total,\n    average: average,\n    grade: grade,\n    status: status\n  }\n}];"
+      },
+      "id": "code-node",
+      "name": "Calculate Grade",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [470, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Calculate Grade",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2",
+  "meta": {
+    "instanceId": "lab01-solution"
+  },
+  "tags": [
+    {
+      "name": "lab01"
+    }
+  ]
+}

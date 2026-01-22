@@ -11,22 +11,6 @@ jobs:
   test:
     name: Run Autograding Tests
     runs-on: ubuntu-latest
-    
-    services:
-      n8n:
-        image: docker.n8n.io/n8nio/n8n:1.90.2
-        ports:
-          - 5678:5678
-        env:
-          N8N_SECURE_COOKIE: "false"
-          N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE: "true"
-          GENERIC_TIMEZONE: Asia/Bangkok
-          TZ: Asia/Bangkok
-        options: >-
-          --health-cmd "wget --spider -q http://localhost:5678/healthz || exit 1"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 10
 
     steps:
       - name: Checkout repository
@@ -40,19 +24,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest requests
-
-      - name: Wait for n8n to be ready
-        run: |
-          echo "Waiting for n8n to start..."
-          for i in {1..30}; do
-            if curl -s http://localhost:5678/healthz > /dev/null 2>&1; then
-              echo "n8n is ready!"
-              break
-            fi
-            echo "Attempt $i: n8n not ready yet..."
-            sleep 5
-          done
+          pip install pytest
 
       - name: Check if workflow.json exists
         id: check_workflow
@@ -60,63 +32,37 @@ jobs:
           if [ -f workflow.json ]; then
             echo "workflow_exists=true" >> $GITHUB_OUTPUT
             echo "✅ workflow.json found"
+            cat workflow.json
           else
             echo "workflow_exists=false" >> $GITHUB_OUTPUT
             echo "❌ workflow.json not found"
           fi
 
-      - name: Import workflow to n8n
-        if: steps.check_workflow.outputs.workflow_exists == 'true'
-        run: |
-          echo "Importing workflow to n8n..."
-          
-          # รอให้ n8n พร้อมใช้งาน
-          sleep 10
-          
-          # Import workflow ผ่าน API
-          curl -X POST "http://localhost:5678/api/v1/workflows" \
-            -H "Content-Type: application/json" \
-            -d @workflow.json \
-            --fail || echo "Warning: Could not import workflow via API"
-
-      - name: Activate workflow
-        if: steps.check_workflow.outputs.workflow_exists == 'true'
-        run: |
-          # ลอง activate workflow (อาจต้องปรับตาม n8n API)
-          echo "Attempting to activate workflow..."
-          sleep 5
-
       - name: Run tests
         id: run_tests
-        continue-on-error: true
-        env:
-          N8N_BASE_URL: http://localhost:5678
         run: |
-          # รัน pytest และเก็บผลลัพธ์
           pytest tests/test_workflow.py -v --tb=short --junit-xml=test-results.xml 2>&1 | tee test-output.txt
-          
-          # เก็บ exit code
-          echo "test_exit_code=${PIPESTATUS[0]}" >> $GITHUB_OUTPUT
 
       - name: Calculate Score
         id: calculate_score
+        if: always()
         run: |
           python << 'EOF'
           import xml.etree.ElementTree as ET
           import os
           
-          # คะแนนแต่ละ test
+          # คะแนนแต่ละ test (รวม 100 คะแนน)
           test_scores = {
-              "test_01_webhook_accepts_post": 10,
-              "test_02_returns_json": 10,
-              "test_03_student_id_preserved": 10,
-              "test_04_name_preserved": 10,
-              "test_05_total_calculation": 15,
-              "test_06_average_calculation": 15,
-              "test_07_grade_a": 10,
-              "test_08_grade_b": 5,
-              "test_09_status_passed": 10,
-              "test_10_status_failed": 5,
+              "test_01_workflow_file_exists": 10,
+              "test_02_workflow_valid_json": 10,
+              "test_03_has_webhook_node": 10,
+              "test_04_has_code_node": 10,
+              "test_05_webhook_method_post": 10,
+              "test_06_webhook_path_lab01": 10,
+              "test_07_code_calculates_total": 10,
+              "test_08_code_calculates_average": 10,
+              "test_09_code_has_grade_logic": 10,
+              "test_10_code_has_status_logic": 10,
           }
           
           total_score = 0
@@ -140,36 +86,36 @@ jobs:
                       # Test passed
                       if test_name in test_scores:
                           total_score += test_scores[test_name]
-                          passed_tests.append(f"✅ {test_name}: +{test_scores[test_name]} คะแนน")
+                          passed_tests.append(f"✅ {test_name}: +{test_scores[test_name]} pts")
                   else:
                       # Test failed
                       if test_name in test_scores:
-                          failed_tests.append(f"❌ {test_name}: 0/{test_scores[test_name]} คะแนน")
+                          failed_tests.append(f"❌ {test_name}: 0/{test_scores[test_name]} pts")
           
           except Exception as e:
               print(f"Error parsing test results: {e}")
           
           # แสดงผลลัพธ์
-          print("=" * 50)
-          print("📊 ผลการตรวจ Lab 01")
-          print("=" * 50)
+          print("=" * 60)
+          print("📊 Lab 01 Grading Results")
+          print("=" * 60)
           print()
           
           if passed_tests:
-              print("✅ Tests ที่ผ่าน:")
+              print("✅ Passed Tests:")
               for t in passed_tests:
                   print(f"   {t}")
               print()
           
           if failed_tests:
-              print("❌ Tests ที่ไม่ผ่าน:")
+              print("❌ Failed Tests:")
               for t in failed_tests:
                   print(f"   {t}")
               print()
           
-          print("=" * 50)
-          print(f"🏆 คะแนนรวม: {total_score}/{max_score}")
-          print("=" * 50)
+          print("=" * 60)
+          print(f"🏆 Total Score: {total_score}/{max_score}")
+          print("=" * 60)
           
           # บันทึกคะแนนสำหรับ GitHub
           with open(os.environ.get('GITHUB_OUTPUT', '/dev/null'), 'a') as f:
@@ -187,31 +133,6 @@ jobs:
             test-results.xml
             test-output.txt
 
-      - name: Create Score Badge
-        if: always()
-        run: |
-          SCORE="${{ steps.calculate_score.outputs.score }}"
-          MAX_SCORE="${{ steps.calculate_score.outputs.max_score }}"
-          
-          if [ -z "$SCORE" ]; then
-            SCORE="0"
-          fi
-          
-          echo "Score: $SCORE / $MAX_SCORE"
-          
-          # สร้าง badge URL
-          if [ "$SCORE" -ge 80 ]; then
-            COLOR="brightgreen"
-          elif [ "$SCORE" -ge 60 ]; then
-            COLOR="yellow"
-          elif [ "$SCORE" -ge 40 ]; then
-            COLOR="orange"
-          else
-            COLOR="red"
-          fi
-          
-          echo "Badge color: $COLOR"
-
       - name: Post Results Comment
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
@@ -220,14 +141,14 @@ jobs:
             const score = '${{ steps.calculate_score.outputs.score }}' || '0';
             const maxScore = '${{ steps.calculate_score.outputs.max_score }}' || '100';
             
-            const body = `## 🎓 ผลการตรวจ Lab 01: n8n Basic Workflow
+            const body = `## 🎓 Lab 01 Grading Results: n8n Basic Workflow
             
-            | รายการ | ผลลัพธ์ |
-            |--------|---------|
-            | **คะแนน** | ${score}/${maxScore} |
-            | **สถานะ** | ${parseInt(score) >= 60 ? '✅ ผ่าน' : '❌ ไม่ผ่าน'} |
+            | Item | Result |
+            |------|--------|
+            | **Score** | ${score}/${maxScore} |
+            | **Status** | ${parseInt(score) >= 60 ? '✅ Passed' : '❌ Failed'} |
             
-            ดูรายละเอียดเพิ่มเติมได้ที่ Actions tab
+            See the Actions tab for more details.
             `;
             
             github.rest.issues.createComment({

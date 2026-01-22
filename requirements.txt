@@ -1,0 +1,5 @@
+# Lab 01: n8n Basic Workflow
+# Python dependencies for testing
+
+pytest>=7.0.0
+requests>=2.28.0

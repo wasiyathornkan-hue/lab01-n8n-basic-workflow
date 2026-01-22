@@ -61,14 +61,14 @@ class TestLab01BasicWorkflow:
                 f"Expected status 200, got {response.status_code}"
         except requests.exceptions.ConnectionError:
             pytest.fail(
-                f"ไม่สามารถเชื่อมต่อ n8n ได้ที่ {WEBHOOK_URL}\n"
-                "กรุณาตรวจสอบว่า:\n"
-                "1. n8n กำลังทำงานอยู่\n"
-                "2. Webhook path ถูกต้อง (/webhook-test/lab01)\n"
-                "3. Workflow ถูก activate แล้ว"
+                f"Cannot connect to n8n at {WEBHOOK_URL}\n"
+                "Please check:\n"
+                "1. n8n is running\n"
+                "2. Webhook path is correct (/webhook-test/lab01)\n"
+                "3. Workflow is activated"
             )
         except requests.exceptions.Timeout:
-            pytest.fail(f"Request timeout หลังจาก {REQUEST_TIMEOUT} วินาที")
+            pytest.fail(f"Request timeout after {REQUEST_TIMEOUT} seconds")
 
     def test_02_returns_json(self):
         """
@@ -92,7 +92,7 @@ class TestLab01BasicWorkflow:
         try:
             response.json()
         except json.JSONDecodeError:
-            pytest.fail("Response ไม่สามารถ parse เป็น JSON ได้")
+            pytest.fail("Response is not valid JSON")
 
     def test_03_student_id_preserved(self):
         """
@@ -117,9 +117,9 @@ class TestLab01BasicWorkflow:
         """
         Test 4: name ถูกส่งกลับมาถูกต้อง (10 คะแนน)
         
-        ตรวจสอบว่า name ใน response ตรงกับ input (รวมถึงภาษาไทย)
+        ตรวจสอบว่า name ใน response ตรงกับ input
         """
-        test_name = "สมชาย ใจดี"
+        test_name = "Somchai Jaidee"
         data = {
             "student_id": "test004",
             "name": test_name,
@@ -262,30 +262,30 @@ class TestWorkflowFile:
         Bonus: ตรวจสอบว่ามีไฟล์ workflow.json
         """
         assert os.path.exists('workflow.json'), \
-            "ไม่พบไฟล์ workflow.json - กรุณา export workflow จาก n8n"
+            "workflow.json not found - please export workflow from n8n"
 
     def test_workflow_valid_json(self):
         """
         Bonus: ตรวจสอบว่า workflow.json เป็น valid JSON
         """
         if not os.path.exists('workflow.json'):
-            pytest.skip("ไม่พบไฟล์ workflow.json")
+            pytest.skip("workflow.json not found")
         
         with open('workflow.json', 'r', encoding='utf-8') as f:
             try:
                 data = json.load(f)
             except json.JSONDecodeError as e:
-                pytest.fail(f"workflow.json ไม่ใช่ valid JSON: {e}")
+                pytest.fail(f"workflow.json is not valid JSON: {e}")
         
         # ตรวจสอบว่ามี nodes
-        assert 'nodes' in data, "workflow.json ไม่มี 'nodes' key"
+        assert 'nodes' in data, "workflow.json missing 'nodes' key"
 
     def test_workflow_has_webhook(self):
         """
         Bonus: ตรวจสอบว่า workflow มี Webhook node
         """
         if not os.path.exists('workflow.json'):
-            pytest.skip("ไม่พบไฟล์ workflow.json")
+            pytest.skip("workflow.json not found")
         
         with open('workflow.json', 'r', encoding='utf-8') as f:
             workflow = json.load(f)
@@ -294,7 +294,7 @@ class TestWorkflowFile:
         node_types = [node.get('type', '').lower() for node in nodes]
         
         has_webhook = any('webhook' in t for t in node_types)
-        assert has_webhook, "Workflow ไม่มี Webhook node"
+        assert has_webhook, "Workflow does not have Webhook node"
 
 
 # ==================== Additional Test Cases (Edge Cases) ====================
@@ -378,7 +378,7 @@ class TestEdgeCases:
         result = response.json()
         
         assert result.get("grade") == "A", \
-            "average = 80 ควรได้เกรด A"
+            "average = 80 should get grade A"
 
     def test_boundary_pass(self):
         """
@@ -394,9 +394,9 @@ class TestEdgeCases:
         result = response.json()
         
         assert result.get("status") == "passed", \
-            "average = 50 ควรได้ status passed"
+            "average = 50 should get status passed"
         assert result.get("grade") == "D", \
-            "average = 50 ควรได้เกรด D"
+            "average = 50 should get grade D"
 
 
 if __name__ == "__main__":

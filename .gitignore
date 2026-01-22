@@ -11,6 +11,9 @@ __pycache__/
 .DS_Store
 Thumbs.db
 
-# Solution (instructor only)
+# Instructor files (ไม่ส่งขึ้น GitHub)
 solution/
 SETUP_GUIDE.md
+workflow-solution.json
+tests/conftest.py
+screenshots/

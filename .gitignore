@@ -28,3 +28,16 @@ Slides/*.snm
 Slides/*.toc
 Slides/*.vrb
 Slides/*.synctex.gz
+
+# Lecture - ส่งแค่ PDF
+Lecture/*.tex
+Lecture/*.aux
+Lecture/*.log
+Lecture/*.nav
+Lecture/*.out
+Lecture/*.snm
+Lecture/*.toc
+Lecture/*.vrb
+Lecture/*.synctex.gz
+Lecture/quiz.md
+Lecture/quiz.txt

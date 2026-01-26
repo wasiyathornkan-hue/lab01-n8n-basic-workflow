@@ -1,0 +1,56 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Instructor files (ไม่ส่งขึ้น GitHub)
+solution/
+SETUP_GUIDE.md
+workflow-solution.json
+tests/conftest.py
+screenshots/
+
+# Slides - ส่งแค่ PDF
+Slides/*.tex
+Slides/*.aux
+Slides/*.log
+Slides/*.nav
+Slides/*.out
+Slides/*.snm
+Slides/*.toc
+Slides/*.vrb
+Slides/*.synctex.gz
+Slides/*.mp4
+
+# Lecture - ส่งแค่ PDF
+Lecture/*.tex
+Lecture/*.aux
+Lecture/*.log
+Lecture/*.nav
+Lecture/*.out
+Lecture/*.snm
+Lecture/*.toc
+Lecture/*.vrb
+Lecture/*.synctex.gz
+Lecture/quiz.md
+Lecture/quiz.txt
+
+# Lesson Plan - ส่งแค่ PDF
+lesson_plan/*
+!lesson_plan/lesson_plan.pdf
+
+# Pre-recorded Lecture - ส่งแค่ไฟล์วีดีโอ
+pre-recorded_lecture/*
+!pre-recorded_lecture/*.mp4
+
+# Audio Podcast - ส่งแค่ไฟล์เสียง
+audio_podcast/*
+!audio_podcast/*.mp3

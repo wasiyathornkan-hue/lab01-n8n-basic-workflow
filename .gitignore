@@ -41,3 +41,7 @@ Lecture/*.vrb
 Lecture/*.synctex.gz
 Lecture/quiz.md
 Lecture/quiz.txt
+
+# Lesson Plan - ส่งแค่ PDF
+lesson_plan/*
+!lesson_plan/lesson_plan.pdf

@@ -45,3 +45,11 @@ Lecture/quiz.txt
 # Lesson Plan - ส่งแค่ PDF
 lesson_plan/*
 !lesson_plan/lesson_plan.pdf
+
+# Pre-recorded Lecture - ส่งแค่ Python script
+pre-recorded_lecture/*
+!pre-recorded_lecture/video_generator_lab01.py
+
+# Audio Podcast - ส่งแค่ Python script
+audio_podcast/*
+!audio_podcast/audio_generator_lab01.py

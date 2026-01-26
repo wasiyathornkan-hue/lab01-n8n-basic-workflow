@@ -112,10 +112,21 @@ return [{
 }];
 ```
 
-### Step 4: ทดสอบ Workflow
+### Step 4.1: ทดสอบ Workflow for Mac/Linux
 ```bash
-curl -X POST https://value3.app.n8n.cloud/webhook-test/lab01 -H "Content-Type: application/json" -d "{\"student_id\": \"65001234\", \"name\": \"Somchai Jaidee\", \"scores\": [85, 90, 78, 92, 88]}"
+curl -X POST http://localhost:5678/webhook-test/lab01 \
+  -H "Content-Type: application/json" \
+  -d '{"student_id": "65001234", "name": "Somchai Jaidee", "scores": [85, 90, 78, 92, 88]}'
 ```
+
+### Step 4.2: ทดสอบ Workflow for Windows
+```bash
+curl -X POST http://localhost:5678/webhook-test/lab01 -H "Content-Type: application/json" -d "{\"student_id\": \"65001234\", \"name\": \"Somchai Jaidee\", \"scores\": [85, 90, 78, 92, 88]}"
+```
+
+### Step 4.3: ทดสอบ Workflow
+1. เปลี่ยน http://localhost:5678 ให้เป็น URL n8n ของตัวเอง
+2. เปลี่ยน /webhook-test/lab01 เป็น webhook/lab01 ในกรณีขึ้น production
 
 ### Step 5: Export และส่งงาน
 1. คลิก Menu (⋮) > Download

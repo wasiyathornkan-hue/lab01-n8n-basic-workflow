@@ -114,9 +114,7 @@ return [{
 
 ### Step 4: ทดสอบ Workflow
 ```bash
-curl -X POST http://localhost:5678/webhook-test/lab01 \
-  -H "Content-Type: application/json" \
-  -d '{"student_id": "65001234", "name": "Somchai Jaidee", "scores": [85, 90, 78, 92, 88]}'
+curl -X POST https://value3.app.n8n.cloud/webhook-test/lab01 -H "Content-Type: application/json" -d "{\"student_id\": \"65001234\", \"name\": \"Somchai Jaidee\", \"scores\": [85, 90, 78, 92, 88]}"
 ```
 
 ### Step 5: Export และส่งงาน

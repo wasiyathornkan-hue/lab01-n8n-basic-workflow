@@ -1,6 +1,61 @@
 {
-  "_comment": "นักศึกษาต้อง export workflow จาก n8n แล้วแทนที่ไฟล์นี้",
-  "name": "PLACEHOLDER",
-  "nodes": [],
-  "connections": {}
+  "name": "lad-01-66079501",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lab01",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5f0210ef-83ad-438f-b677-367a28944947",
+      "name": "Webhook",
+      "webhookId": "12967243-e300-4d15-83a9-e1fe52955a32"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst input = item.body || item;\n\nconst total = input.scores.reduce((sum, score) => sum + score, 0);\nconst average = Math.round((total / input.scores.length) * 10) / 10;\n\nlet grade;\nif (average >= 80) grade = 'A';\nelse if (average >= 70) grade = 'B';\nelse if (average >= 60) grade = 'C';\nelse if (average >= 50) grade = 'D';\nelse grade = 'F';\n\nconst status = average >= 50 ? 'passed' : 'failed';\n\nreturn [{\n  json: {\n    student_id: input.student_id,\n    name: input.name,\n    total: total,\n    average: average,\n    grade: grade,\n    status: status\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "8668b655-1a92-47cd-a2b4-6adb4ef22bb1",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "2970fa0e-7c18-493d-9acd-bea7b256f0d7",
+  "meta": {
+    "instanceId": "f2f23fffc6cc54ae968b40704d2f4cc3c1604d5914d9365a6557ee29565ace91"
+  },
+  "id": "YqOtxN2xA9wlWvTB",
+  "tags": []
 }
